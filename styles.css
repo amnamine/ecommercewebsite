@@ -1,0 +1,227 @@
+/* styles.css */
+
+/* Ensure the Inter font is applied if Tailwind's default doesn't catch everything or for non-Tailwind elements */
+body {
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Animations */
+
+/* Gradient background animation for Hero section and Auth pages */
+@keyframes gradientBackground {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.animate-gradientBG {
+    background-size: 200% 200%;
+    /* Increase size for smoother animation */
+    animation: gradientBackground 15s ease infinite;
+}
+
+/* FadeIn animation for dropdowns or appearing elements */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* SlideInUp animation for hero text */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slideInUp {
+    animation: slideInUp 0.6s ease-out forwards;
+}
+
+/* BounceIn animation for hero button */
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    70% {
+        transform: scale(0.9);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.animate-bounceIn {
+    animation: bounceIn 0.6s ease-out forwards;
+}
+
+/* Pulse animation for cart count or sale tags (Tailwind has 'animate-pulse' but this is a more traditional CSS version if needed) */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+/* .animate-pulse in Tailwind is good, this is an alternative or for elements not using Tailwind's pulse directly */
+
+
+/* Subtle background pattern for hero (optional) */
+.bg-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414zM41.95 17.536l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+
+/* Custom scrollbar (optional, for a more polished look) - Webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c5c5c5;
+    /* Softer gray */
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a0a0a0;
+    /* Darker gray on hover */
+}
+
+/* Styling for the password toggle icon if needed, though Tailwind classes usually suffice */
+/* Example: .password-toggle-icon { cursor: pointer; } */
+
+
+/* Additional specific element styling if Tailwind isn't enough or for overrides */
+
+/* Product card hover effect - Tailwind group-hover is used, but this can be a fallback or addition */
+.product-card:hover .product-image {
+    /* Example if not using group-hover:scale-110 */
+    /* transform: scale(1.05); */
+}
+
+/* Category card icon container default and hover states */
+.category-card .fa-2x {
+    /* Ensure icons in category cards are consistently sized if needed */
+    /* font-size: 1.75rem; /* Adjust if fa-2x isn't perfect with padding */
+}
+
+/* Deal card countdown timer styling */
+#countdown1,
+#countdown2 {
+    /* font-weight: 500; */
+    /* Tailwind's font-medium is likely applied */
+}
+
+/* Input focus states - Tailwind's focus:ring and focus:border are generally preferred */
+/* input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #6366f1; /* Indigo-500
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3); /* Indigo-500 with opacity
+} */
+
+/* Button hover/focus states - Tailwind handles this well, but for custom buttons: */
+/* .custom-btn {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.custom-btn:hover {
+    transform: translateY(-1px);
+}
+.custom-btn:active {
+    transform: translateY(0px);
+} */
+
+/* Helper for password strength indicator text color */
+.text-strength-weak {
+    color: #ef4444;
+}
+
+/* red-500 */
+.text-strength-medium {
+    color: #f59e0b;
+}
+
+/* amber-500 */
+.text-strength-strong {
+    color: #10b981;
+}
+
+/* emerald-500 */
+
+/* Message area styling for login/register forms */
+#loginMessage p.success,
+#registerMessage p.success {
+    color: #10b981;
+    /* emerald-500 */
+    background-color: #d1fae5;
+    /* emerald-100 */
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    /* rounded-lg */
+    border: 1px solid #6ee7b7;
+    /* emerald-300 */
+}
+
+#loginMessage p.error,
+#registerMessage p.error {
+    color: #ef4444;
+    /* red-500 */
+    background-color: #fee2e2;
+    /* red-100 */
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    /* rounded-lg */
+    border: 1px solid #fca5a5;
+    /* red-300 */
+}
+
+/* Ensure sticky header doesn't cause layout shifts if content below it is too close */
+/* body { padding-top: 5rem; } /* Adjust if header height (h-20 = 5rem) causes issues. Only if sticky header overlaps. */
+/* This is generally not needed if the sticky header is part of the normal document flow before becoming sticky. */

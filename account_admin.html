@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - ElectroMart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="font-inter bg-gray-100 text-gray-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <svg class="h-10 w-10 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    </svg>
+                    <span class="text-2xl font-bold text-indigo-600">ElectroMart</span>
+                </a>
+
+                <nav class="flex items-center space-x-3 sm:space-x-5">
+                    <a href="index.html" class="text-gray-600 hover:text-indigo-600 transition-colors duration-300 font-medium">Main Site</a>
+                    <div class="relative group">
+                        <button class="text-indigo-600 font-semibold flex items-center">
+                            Admin Panel <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-xl z-20 hidden group-hover:block animate-fadeIn">
+                            <a href="account_admin.html" class="block px-4 py-2 text-sm text-indigo-600 bg-indigo-50 rounded-t-md">Admin Dashboard</a>
+                            <a href="#user-management" data-section="user-management" class="account-nav-link block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">User Management</a>
+                            <a href="#product-management" data-section="product-management" class="account-nav-link block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Product Management</a>
+                            <a href="#order-management" data-section="order-management" class="account-nav-link block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Order Management</a>
+                            <a href="#site-settings" data-section="site-settings" class="account-nav-link block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Site Settings</a>
+                            <a href="#" id="logoutButtonAdmin" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-b-md">Logout</a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col md:flex-row gap-8">
+            <aside class="w-full md:w-1/4">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex items-center mb-6">
+                        <img id="adminAvatar" src="https://placehold.co/100x100/D1D5DB/1F2937?text=Admin" alt="Admin Avatar" class="w-16 h-16 rounded-full mr-4 border-2 border-indigo-200">
+                        <div>
+                            <h2 id="adminName" class="text-xl font-semibold text-gray-800">Admin User</h2>
+                            <p id="adminRole" class="text-sm text-indigo-600 font-medium">Administrator</p>
+                        </div>
+                    </div>
+                    <nav class="space-y-2">
+                        <a href="#dashboard-admin" data-section="dashboard-admin" class="account-nav-link active-nav-link group flex items-center px-4 py-3 text-indigo-700 bg-indigo-100 rounded-lg hover:bg-indigo-200 transition-colors">
+                            <i class="fas fa-shield-alt w-5 h-5 mr-3 text-indigo-500 group-hover:text-indigo-700"></i>
+                            Dashboard
+                        </a>
+                        <a href="#user-management" data-section="user-management" class="account-nav-link group flex items-center px-4 py-3 text-gray-600 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-colors">
+                            <i class="fas fa-users-cog w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-700"></i>
+                            User Management
+                        </a>
+                        <a href="#product-management" data-section="product-management" class="account-nav-link group flex items-center px-4 py-3 text-gray-600 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-colors">
+                            <i class="fas fa-cubes w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-700"></i>
+                            Product Management
+                        </a>
+                        <a href="#order-management" data-section="order-management" class="account-nav-link group flex items-center px-4 py-3 text-gray-600 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-colors">
+                            <i class="fas fa-file-invoice-dollar w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-700"></i>
+                            Order Management
+                        </a>
+                        <a href="#site-settings" data-section="site-settings" class="account-nav-link group flex items-center px-4 py-3 text-gray-600 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-colors">
+                            <i class="fas fa-cogs w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-700"></i>
+                            Site Settings
+                        </a>
+                        <a href="#" id="sidebarLogoutButtonAdmin" class="group flex items-center px-4 py-3 text-gray-600 rounded-lg hover:bg-red-100 hover:text-red-700 transition-colors">
+                            <i class="fas fa-sign-out-alt w-5 h-5 mr-3 text-gray-400 group-hover:text-red-700"></i>
+                            Logout
+                        </a>
+                    </nav>
+                </div>
+            </aside>
+
+            <section id="adminAccountContent" class="w-full md:w-3/4">
+                <div id="dashboard-admin-section" class="account-section bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Admin Dashboard</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-red-50 p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+                            <div class="flex items-center text-red-600 mb-2">
+                                <i class="fas fa-users fa-2x mr-3"></i>
+                                <span class="text-3xl font-bold" id="totalUsers">150</span>
+                            </div>
+                            <p class="text-gray-700">Total Users</p>
+                        </div>
+                        <div class="bg-yellow-50 p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+                            <div class="flex items-center text-yellow-600 mb-2">
+                                <i class="fas fa-box-open fa-2x mr-3"></i>
+                                <span class="text-3xl font-bold" id="totalProductsAdmin">560</span>
+                            </div>
+                            <p class="text-gray-700">Total Products</p>
+                        </div>
+                        <div class="bg-green-50 p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+                            <div class="flex items-center text-green-600 mb-2">
+                                <i class="fas fa-dollar-sign fa-2x mr-3"></i>
+                                <span class="text-3xl font-bold" id="totalRevenueAdmin">$25,600</span>
+                            </div>
+                            <p class="text-gray-700">Total Revenue (Month)</p>
+                        </div>
+                    </div>
+                    <div class="mt-8">
+                        <h4 class="text-xl font-semibold text-gray-700 mb-4">System Health</h4>
+                        <p class="text-gray-600">System status: <span class="text-green-500 font-semibold">All systems operational</span>.</p>
+                        </div>
+                </div>
+
+                <div id="user-management-section" class="account-section hidden bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">User Management</h3>
+                    <div class="mb-4 flex justify-between items-center">
+                        <input type="text" placeholder="Search users by email or name..." class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 w-1/2">
+                        <button class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg text-sm"><i class="fas fa-user-plus mr-1"></i> Add New User</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">John Buyer</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">john.buyer@example.com</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Buyer</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-10</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                                        <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jane Seller</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">jane.seller@example.com</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Seller</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-04-20</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                                        <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="product-management-section" class="account-section hidden bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Product Management</h3>
+                     <div class="mb-4 flex justify-between items-center">
+                        <input type="text" placeholder="Search products by name or SKU..." class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 w-1/2">
+                        <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg text-sm"><i class="fas fa-eye mr-1"></i> View All Products</button>
+                    </div>
+                    <p class="text-gray-600">Product management interface (e.g., approve/reject seller products, feature products, manage categories).</p>
+                    </div>
+
+                <div id="order-management-section" class="account-section hidden bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Order Management</h3>
+                    <input type="text" placeholder="Search orders by ID or customer..." class="mb-4 px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 w-full">
+                    <p class="text-gray-600">Order overview, search, and management tools (e.g., view order details, manage refunds, track shipments).</p>
+                    </div>
+
+                <div id="site-settings-section" class="account-section hidden bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Site Settings</h3>
+                    <form id="siteSettingsForm" class="space-y-6">
+                        <div>
+                            <label for="siteName" class="block text-sm font-medium text-gray-700 mb-1">Site Name</label>
+                            <input type="text" id="siteName" name="siteName" value="ElectroMart" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="adminEmail" class="block text-sm font-medium text-gray-700 mb-1">Default Admin Email</label>
+                            <input type="email" id="adminEmail" name="adminEmail" value="admin@electromart.com" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="maintenanceMode" class="block text-sm font-medium text-gray-700 mb-1">Maintenance Mode</label>
+                            <select id="maintenanceMode" name="maintenanceMode" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                                <option value="disabled" selected>Disabled</option>
+                                <option value="enabled">Enabled</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors">Save Settings</button>
+                    </form>
+                    <div id="siteSettingsMessage" class="mt-4 text-sm"></div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300 pt-12 pb-8 mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="border-t border-gray-700 pt-8 text-center text-sm">
+                <p>&copy; <span id="currentYearAdmin"></span> ElectroMart. All Rights Reserved. Admin Panel.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script> <script>
+        // Client-side script for admin account page
+        document.addEventListener('DOMContentLoaded', () => {
+            const accountNavLinks = document.querySelectorAll('.account-nav-link');
+            const accountSections = document.querySelectorAll('.account-section');
+            const adminNameDisplay = document.getElementById('adminName');
+            // const adminRoleDisplay = document.getElementById('adminRole'); // Already static text
+            const logoutButtonAdmin = document.getElementById('logoutButtonAdmin');
+            const sidebarLogoutButtonAdmin = document.getElementById('sidebarLogoutButtonAdmin');
+            const currentYearAdmin = document.getElementById('currentYearAdmin');
+
+            if(currentYearAdmin) currentYearAdmin.textContent = new Date().getFullYear();
+
+            function displayAdminInfo() {
+                const token = localStorage.getItem('authToken');
+                if (token) {
+                    try {
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                         if (payload.accountType !== 'admin') {
+                            // console.warn("Access denied: Not an admin account.");
+                            // window.location.href = 'index.html'; // Or login page
+                            // return;
+                        }
+                        if (adminNameDisplay) adminNameDisplay.textContent = payload.fullName || 'Admin User';
+                    } catch (e) {
+                        console.error("Error decoding token or admin data not found:", e);
+                        // window.location.href = 'login.html';
+                    }
+                } else {
+                    console.log('No auth token found, redirecting to login.');
+                    // window.location.href = 'login.html';
+                }
+            }
+            
+            displayAdminInfo();
+
+            function switchSection(sectionId) {
+                accountSections.forEach(section => section.classList.add('hidden'));
+                const activeSection = document.getElementById(`${sectionId}-section`);
+                if (activeSection) activeSection.classList.remove('hidden');
+
+                accountNavLinks.forEach(link => {
+                    link.classList.remove('active-nav-link', 'bg-indigo-100', 'text-indigo-700');
+                    link.classList.add('text-gray-600');
+                    if (link.dataset.section === sectionId) {
+                        link.classList.add('active-nav-link', 'bg-indigo-100', 'text-indigo-700');
+                        link.classList.remove('text-gray-600');
+                    }
+                });
+                window.location.hash = sectionId;
+            }
+
+            accountNavLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const sectionId = link.dataset.section;
+                    switchSection(sectionId);
+                });
+            });
+
+            if (window.location.hash) {
+                const sectionIdFromHash = window.location.hash.substring(1);
+                 const targetSection = document.getElementById(`${sectionIdFromHash}-section`);
+                 if (targetSection && Array.from(accountNavLinks).some(link => link.dataset.section === sectionIdFromHash)) {
+                    switchSection(sectionIdFromHash);
+                } else {
+                     switchSection('dashboard-admin'); 
+                }
+            } else {
+                switchSection('dashboard-admin'); // Default for admin
+            }
+
+            function handleAdminLogout() {
+                localStorage.removeItem('authToken');
+                console.log('Admin logged out.');
+                window.location.href = 'login.html';
+            }
+
+            if(logoutButtonAdmin) logoutButtonAdmin.addEventListener('click', handleAdminLogout);
+            if(sidebarLogoutButtonAdmin) sidebarLogoutButtonAdmin.addEventListener('click', handleAdminLogout);
+            
+            // Site Settings Form (Placeholder)
+            const siteSettingsForm = document.getElementById('siteSettingsForm');
+            if(siteSettingsForm) {
+                siteSettingsForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    const messageDiv = document.getElementById('siteSettingsMessage');
+                    messageDiv.textContent = 'Site settings saved (simulation)!';
+                    messageDiv.className = 'text-green-600';
+                    console.log('Site settings form submitted. Implement API call.');
+                    setTimeout(() => { messageDiv.textContent = ''; }, 3000);
+                });
+            }
+            
+            // TODO: Implement API calls for fetching/updating admin data, users, products, orders, settings.
+        });
+    </script>
+</body>
+</html>
