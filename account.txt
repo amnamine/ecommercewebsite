@@ -1,0 +1,15 @@
+=== ElectroMart Account Credentials ===
+
+1. Admin Account:
+   Email: admin@electromart.com
+   Password: Admin@123
+
+2. Test Seller Account:
+   Email: seller@electromart.com
+   Password: Seller@123
+
+3. Test Buyer Account:
+   Email: buyer@electromart.com
+   Password: Buyer@123
+
+Note: These are test accounts. In a production environment, please use strong, unique passwords and enable two-factor authentication. 

@@ -1,0 +1,15 @@
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-02T23:18:32.935Z"}
+{"level":"info","message":"Connected to the SQLite database.","timestamp":"2025-06-02T23:18:32.949Z"}
+{"level":"info","message":"Users table checked/created successfully.","timestamp":"2025-06-02T23:18:32.987Z"}
+{"level":"info","message":"Products table checked/created successfully.","timestamp":"2025-06-02T23:18:32.989Z"}
+{"level":"info","message":"Admin user already exists.","timestamp":"2025-06-02T23:18:33.004Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-02T23:19:10.972Z"}
+{"level":"info","message":"Connected to the SQLite database.","timestamp":"2025-06-02T23:19:10.984Z"}
+{"level":"info","message":"Users table checked/created successfully.","timestamp":"2025-06-02T23:19:10.992Z"}
+{"level":"info","message":"Products table checked/created successfully.","timestamp":"2025-06-02T23:19:10.994Z"}
+{"level":"info","message":"Admin user already exists.","timestamp":"2025-06-02T23:19:10.996Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-06-02T23:20:45.857Z"}
+{"level":"info","message":"Connected to the SQLite database.","timestamp":"2025-06-02T23:20:45.870Z"}
+{"level":"info","message":"Users table checked/created successfully.","timestamp":"2025-06-02T23:20:45.876Z"}
+{"level":"info","message":"Products table checked/created successfully.","timestamp":"2025-06-02T23:20:45.879Z"}
+{"level":"info","message":"Admin user already exists.","timestamp":"2025-06-02T23:20:45.884Z"}

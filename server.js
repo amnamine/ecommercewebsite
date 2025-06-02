@@ -1,187 +1,236 @@
 // server.js
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const sqlite3 = require('sqlite3').verbose(); // Use verbose for more detailed error messages
-const bcrypt = require('bcrypt'); // For password hashing
-const jwt = require('jsonwebtoken'); // For JSON Web Tokens
-const crypto = require('crypto'); // For generating JWT secret
+const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const helmet = require('helmet');
+const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+const { body, validationResult } = require('express-validator');
+const winston = require('winston');
+const morgan = require('morgan');
+const config = require('./src/config/config');
+const logger = require('./src/utils/logger');
+const routes = require('./src/routes');
+
+// Configure logger
+const loggerWinston = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+    ),
+    transports: [
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'combined.log' })
+    ]
+});
+
+if (process.env.NODE_ENV !== 'production') {
+    loggerWinston.add(new winston.transports.Console({
+        format: winston.format.simple()
+    }));
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SALT_ROUNDS = 10; // For bcrypt password hashing
-const JWT_SECRET = crypto.randomBytes(64).toString('hex'); // Generate a secure random secret for JWT
+const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 10;
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// Security middleware
+app.use(helmet(config.security));
+app.use(cors(config.cors));
+
+// Rate limiting
+const limiter = rateLimit(config.rateLimit);
+app.use(limiter);
+
+// Logging
+app.use(morgan('combined', { stream: logger.stream }));
+
+// Body parsing
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Static files
+app.use(express.static(path.join(__dirname, 'public')));
 
 // --- Database Setup ---
-// Initialize SQLite database
-// The database file will be created in the project root if it doesn't exist.
 const dbPath = path.resolve(__dirname, 'database.sqlite');
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
-        console.error('Error opening database:', err.message);
+        loggerWinston.error('Error opening database:', err.message);
     } else {
-        console.log('Connected to the SQLite database.');
-        // Create users table if it doesn't exist
-        db.run(`CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            fullName TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            accountType TEXT NOT NULL CHECK(accountType IN ('buyer', 'seller', 'admin')),
-            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-        )`, (err) => {
-            if (err) {
-                console.error("Error creating users table:", err.message);
-            } else {
-                console.log("Users table checked/created successfully.");
-                // Optional: Create an admin user if one doesn't exist
-                createDefaultAdmin();
-            }
-        });
-        // Placeholder for products table (expand later)
-        db.run(`CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            description TEXT,
-            price REAL NOT NULL,
-            category TEXT,
-            imageUrl TEXT,
-            stock INTEGER DEFAULT 0,
-            sellerId INTEGER, /* To link to a seller user */
-            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (sellerId) REFERENCES users(id)
-        )`, (err) => {
-            if (err) console.error("Error creating products table:", err.message);
-            else console.log("Products table checked/created successfully.");
-        });
+        loggerWinston.info('Connected to the SQLite database.');
+        initializeDatabase();
     }
 });
 
+function initializeDatabase() {
+    // Create users table
+    db.run(`CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        fullName TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        accountType TEXT NOT NULL CHECK(accountType IN ('buyer', 'seller', 'admin')),
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        lastLogin DATETIME,
+        failedLoginAttempts INTEGER DEFAULT 0
+    )`, (err) => {
+        if (err) {
+            loggerWinston.error("Error creating users table:", err.message);
+        } else {
+            loggerWinston.info("Users table checked/created successfully.");
+            createDefaultAdmin();
+        }
+    });
+
+    // Create products table
+    db.run(`CREATE TABLE IF NOT EXISTS products (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        description TEXT,
+        price REAL NOT NULL,
+        category TEXT,
+        imageUrl TEXT,
+        stock INTEGER DEFAULT 0,
+        sellerId INTEGER,
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (sellerId) REFERENCES users(id)
+    )`, (err) => {
+        if (err) loggerWinston.error("Error creating products table:", err.message);
+        else loggerWinston.info("Products table checked/created successfully.");
+    });
+}
+
 function createDefaultAdmin() {
-    const adminEmail = 'admin@electromart.com';
-    const adminPassword = 'SecureAdminPassword123!'; // Change this in a real app
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
 
     db.get('SELECT * FROM users WHERE email = ? AND accountType = ?', [adminEmail, 'admin'], (err, row) => {
         if (err) {
-            console.error('Error checking for admin user:', err.message);
+            loggerWinston.error('Error checking for admin user:', err.message);
             return;
         }
         if (!row) {
             bcrypt.hash(adminPassword, SALT_ROUNDS, (err, hashedPassword) => {
                 if (err) {
-                    console.error('Error hashing admin password:', err.message);
+                    loggerWinston.error('Error hashing admin password:', err.message);
                     return;
                 }
                 db.run('INSERT INTO users (fullName, email, password, accountType) VALUES (?, ?, ?, ?)',
                     ['Admin User', adminEmail, hashedPassword, 'admin'],
                     (err) => {
                         if (err) {
-                            console.error('Error creating default admin user:', err.message);
+                            loggerWinston.error('Error creating default admin user:', err.message);
                         } else {
-                            console.log(`Default admin user created: ${adminEmail}`);
-                            console.log(`IMPORTANT: Default admin password is "${adminPassword}". Please change this immediately if this were a production system.`);
+                            loggerWinston.info(`Default admin user created: ${adminEmail}`);
                         }
                     }
                 );
             });
         } else {
-            console.log('Admin user already exists.');
+            loggerWinston.info('Admin user already exists.');
         }
     });
 }
 
-
-// --- Middleware ---
-app.use(express.json()); // Parses incoming requests with JSON payloads
-app.use(express.urlencoded({ extended: true })); // Parses incoming requests with URL-encoded payloads
-
-// Serve static files (HTML, CSS, JS from the root directory)
-// This assumes your HTML files (index.html, login.html, etc.) are in the root or a 'public' folder.
-// For simplicity, let's assume they are in the root alongside server.js.
-app.use(express.static(path.join(__dirname, '.'))); // Serves files from the current directory
-
-// --- API Routes ---
+// Validation middleware
+const registerValidation = [
+    body('email').isEmail().normalizeEmail(),
+    body('password').isLength({ min: 8 })
+        .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/)
+        .withMessage('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
+    body('fullName').trim().notEmpty(),
+    body('accountType').isIn(['buyer', 'seller'])
+];
 
 // Registration Route
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', registerValidation, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     const { fullName, email, password, accountType } = req.body;
 
-    // Basic validation
-    if (!fullName || !email || !password || !accountType) {
-        return res.status(400).json({ message: 'All fields are required.' });
-    }
-    if (!['buyer', 'seller'].includes(accountType)) { // Admin accounts should be created differently
-        return res.status(400).json({ message: 'Invalid account type.' });
-    }
-
     try {
-        // Check if user already exists
         db.get('SELECT email FROM users WHERE email = ?', [email], async (err, row) => {
             if (err) {
-                console.error("Database error during registration check:", err.message);
+                loggerWinston.error("Database error during registration check:", err.message);
                 return res.status(500).json({ message: 'Server error during registration.' });
             }
             if (row) {
-                return res.status(409).json({ message: 'Email already registered.' }); // 409 Conflict
+                return res.status(409).json({ message: 'Email already registered.' });
             }
 
-            // Hash password
             const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-            // Insert user into database
             const sql = 'INSERT INTO users (fullName, email, password, accountType) VALUES (?, ?, ?, ?)';
-            db.run(sql, [fullName, email, hashedPassword, accountType], function(err) { // Use function for this.lastID
+            db.run(sql, [fullName, email, hashedPassword, accountType], function(err) {
                 if (err) {
-                    console.error("Database error during user insertion:", err.message);
+                    loggerWinston.error("Database error during user insertion:", err.message);
                     return res.status(500).json({ message: 'Could not register user.' });
                 }
                 res.status(201).json({ message: 'User registered successfully!', userId: this.lastID });
             });
         });
     } catch (error) {
-        console.error('Error during registration process:', error);
+        loggerWinston.error('Error during registration process:', error);
         res.status(500).json({ message: 'Server error.' });
     }
 });
 
 // Login Route
-app.post('/api/login', (req, res) => {
+app.post('/api/login', limiter, async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
         return res.status(400).json({ message: 'Email and password are required.' });
     }
 
-    const sql = 'SELECT * FROM users WHERE email = ?';
-    db.get(sql, [email], async (err, user) => {
-        if (err) {
-            console.error("Database error during login:", err.message);
-            return res.status(500).json({ message: 'Server error during login.' });
-        }
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials. User not found.' }); // Unauthorized
-        }
+    try {
+        const sql = 'SELECT * FROM users WHERE email = ?';
+        db.get(sql, [email], async (err, user) => {
+            if (err) {
+                loggerWinston.error("Database error during login:", err.message);
+                return res.status(500).json({ message: 'Server error during login.' });
+            }
+            if (!user) {
+                return res.status(401).json({ message: 'Invalid credentials.' });
+            }
 
-        // Compare submitted password with stored hashed password
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) {
-            return res.status(401).json({ message: 'Invalid credentials. Password incorrect.' }); // Unauthorized
-        }
+            const match = await bcrypt.compare(password, user.password);
+            if (!match) {
+                // Update failed login attempts
+                db.run('UPDATE users SET failedLoginAttempts = failedLoginAttempts + 1 WHERE id = ?', [user.id]);
+                return res.status(401).json({ message: 'Invalid credentials.' });
+            }
 
-        // Passwords match, create JWT
-        const tokenPayload = {
-            userId: user.id,
-            email: user.email,
-            accountType: user.accountType,
-            fullName: user.fullName
-        };
-        const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '1h' }); // Token expires in 1 hour
+            // Reset failed login attempts and update last login
+            db.run('UPDATE users SET failedLoginAttempts = 0, lastLogin = CURRENT_TIMESTAMP WHERE id = ?', [user.id]);
 
-        res.status(200).json({
-            message: 'Login successful!',
-            token: token,
-            user: tokenPayload // Send some user info back
+            const tokenPayload = {
+                userId: user.id,
+                email: user.email,
+                accountType: user.accountType,
+                fullName: user.fullName
+            };
+            const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '1h' });
+
+            res.status(200).json({
+                message: 'Login successful!',
+                token: token,
+                user: tokenPayload
+            });
         });
-    });
+    } catch (error) {
+        loggerWinston.error('Error during login process:', error);
+        res.status(500).json({ message: 'Server error.' });
+    }
 });
 
 // --- JWT Authentication Middleware (Example for protected routes) ---
@@ -222,7 +271,6 @@ app.get('/api/profile', authenticateToken, (req, res) => {
     });
 });
 
-
 // --- HTML File Serving (Ensure these are at the root or adjust paths) ---
 // It's generally better to have a dedicated '/public' folder for client-side assets.
 // If your HTML files (index.html, login.html, register.html) are in the root:
@@ -255,18 +303,30 @@ app.get('/account_admin.html', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, 'account_admin.html'));
 });
 
+// API routes
+app.use('/api', routes);
 
-// --- Global Error Handler (Basic) ---
-// This should be the last middleware
+// Error handling middleware
 app.use((err, req, res, next) => {
-    console.error("Unhandled error:", err.stack);
-    res.status(500).send('Something broke on the server!');
+    loggerWinston.error('Unhandled error:', err);
+
+    res.status(err.status || 500).json({
+        success: false,
+        message: err.message || 'Internal server error'
+    });
 });
 
-// --- Start Server ---
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({
+        success: false,
+        message: 'Route not found'
+    });
+});
+
+// Start server
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-    console.log(`JWT Secret (for debugging, DO NOT expose in production): ${JWT_SECRET.substring(0,10)}...`);
+    loggerWinston.info(`Server is running on port ${PORT}`);
 });
 
 // Graceful shutdown
@@ -279,3 +339,17 @@ process.on('SIGINT', () => {
         process.exit(0);
     });
 });
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+    loggerWinston.error('Uncaught Exception:', error);
+    process.exit(1);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (error) => {
+    loggerWinston.error('Unhandled Rejection:', error);
+    process.exit(1);
+});
+
+module.exports = app;
